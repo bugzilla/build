@@ -15,11 +15,11 @@ sub do_diff {
     my @prior_micro = map { ".$_" } (1..$micro-1);
     foreach my $this ('', @prior_micro) {
         my $diffing = "$base$this";
-        dosys("diff -urN --exclude=CVS --exclude=*.pdf $diffing $latest"
-              . " > $diffing-to-$latest_ver.diff");
+        dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=lib/CGI*"
+              . " $diffing $latest > $diffing-to-$latest_ver.diff");
         dosys("gzip $diffing-to-$latest_ver.diff");
-        dosys("diff -urN --exclude=CVS --exclude=docs $diffing $latest"
-              . " > $diffing-to-$latest_ver-nodocs.diff");
+        dosys("diff -urN --exclude=CVS --exclude=lib/CGI* --exclude=docs"
+              . " $diffing $latest > $diffing-to-$latest_ver-nodocs.diff");
         dosys("gzip $diffing-to-$latest_ver-nodocs.diff");
     }
 }
