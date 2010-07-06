@@ -16,9 +16,11 @@ sub do_diff {
     foreach my $this ('', @prior_micro) {
         my $diffing = "$base$this";
         dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=lib/CGI*"
+              . " --exclude=.bzr"
               . " $diffing $latest > $diffing-to-$latest_ver.diff");
         dosys("gzip $diffing-to-$latest_ver.diff");
         dosys("diff -urN --exclude=CVS --exclude=lib/CGI* --exclude=docs"
+              . " --exclude=.bzr"
               . " $diffing $latest > $diffing-to-$latest_ver-nodocs.diff");
         dosys("gzip $diffing-to-$latest_ver-nodocs.diff");
     }

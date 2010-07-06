@@ -44,7 +44,7 @@ fi
 echo "Installing CGI.pm..."
 ./install-module.pl CGI
 echo "Removing non-essential dependencies from lib/..."
-rm -rf lib/*linux*  lib/man  lib/Test
+rm -rf lib/*linux*  lib/man  lib/Test lib/App lib/ExtUtils lib/TAP lib/CPAN* lib/YAML*
 echo "cd .."
 cd ..
 echo "tar cfz ${BZDIR}.tar.gz $BZDIR"
