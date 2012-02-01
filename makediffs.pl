@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
 use strict;
+
+use File::Temp qw(tmpnam);
+
 sub dosys {
   print "@_\n";
   system @_;
@@ -15,14 +18,24 @@ sub do_diff {
     my @prior_micro = map { ".$_" } (1..$micro-1);
     foreach my $this ('', @prior_micro) {
         my $diffing = "$base$this";
-        dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=lib/*"
-              . " --exclude=.bzr"
+
+	# Move the $base/lib and $diffing/lib to temporary locations
+	# so we don't include them in the diffs
+	my $latest_tempdir_name  = tmpnam();
+        my $diffing_tempdir_name = tmpnam();
+	dosys("mv $latest/lib $latest_tempdir_name");
+	dosys("mv $diffing/lib $diffing_tempdir_name");
+
+        dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=.bzr"
               . " $diffing $latest > $diffing-to-$latest_ver.diff");
         dosys("gzip $diffing-to-$latest_ver.diff");
-        dosys("diff -urN --exclude=CVS --exclude=lib/* --exclude=docs"
-              . " --exclude=.bzr"
+        dosys("diff -urN --exclude=CVS --exclude=docs --exclude=.bzr"
               . " $diffing $latest > $diffing-to-$latest_ver-nodocs.diff");
         dosys("gzip $diffing-to-$latest_ver-nodocs.diff");
+
+	# Move the lib directories back
+	dosys("mv $latest_tempdir_name $latest/lib");
+        dosys("mv $diffing_tempdir_name $diffing/lib");
     }
 }
 
