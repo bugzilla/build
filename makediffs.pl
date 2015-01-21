@@ -26,10 +26,10 @@ sub do_diff {
 	dosys("mv $latest/lib $latest_tempdir_name");
 	dosys("mv $diffing/lib $diffing_tempdir_name");
 
-        dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=.bzr"
+        dosys("diff -urN --exclude=CVS --exclude=*.pdf --exclude=.bzr --exclude=.git"
               . " $diffing $latest > $diffing-to-$latest_ver.diff");
         dosys("gzip $diffing-to-$latest_ver.diff");
-        dosys("diff -urN --exclude=CVS --exclude=docs --exclude=.bzr"
+        dosys("diff -urN --exclude=CVS --exclude=docs --exclude=.bzr --exclude=.git"
               . " $diffing $latest > $diffing-to-$latest_ver-nodocs.diff");
         dosys("gzip $diffing-to-$latest_ver-nodocs.diff");
 

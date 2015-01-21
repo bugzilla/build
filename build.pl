@@ -1,40 +1,37 @@
-#!/usr/bin/perl -w
-#
-use strict;
-use Getopt::Long;
+#!/usr/bin/env perl
 
+use warnings;
+use strict;
+
+use Getopt::Long;
+ 
 our %switch;
-GetOptions(\%switch, 'dev|d');
+GetOptions(\%switch, 'docs|d');
 
 sub do_command {
     print join(' ', @_), "\n";
     system(@_) && die $!;
 }
 
-my ($branch, $tag) = @ARGV;
-$branch || die "first argument must be the branch nickname";
-$tag || die "second argument must be the version number";
+my $tag = shift @ARGV;
 
-my $full_url  = "bzr://bzr.mozilla.org/bugzilla/$branch";
+$tag || die "second argument must be the version number (bugzilla-<version> git tag)";
+
+# git clone https://git.mozilla.org/bugzilla/bugzilla.git
+# --single-branch only checksout the branch the tag exists in
+# --depth 1 is used to omit getting full history
+# -b <tag_name> only clones up to the tag such as bugzilla-4.4.6
 my $full_name = "bugzilla-$tag";
-my @lightweight = $switch{'dev'} ? () : ('--lightweight');
+my $full_url  = "https://git.mozilla.org/bugzilla/bugzilla.git";
 
-do_command('bzr', 'co', @lightweight, "-r", "tag:$full_name", 
-           $full_url, $full_name);
+do_command('git', 'clone', $full_url, "--single-branch", "--depth", 1, "-b", $full_name, $full_name);
 
 print "cd $full_name\n";
 chdir $full_name or die "$full_name: $!";
 
-print "Building docs...\n";
-do_command("perl", "-w", "docs/makedocs.pl", "--with-pdf");
-
-print "Installing CGI.pm...\n";
-system("perl5.8.1", "install-module.pl", "CGI");
-my @lib_contents = glob("lib/*");
-foreach my $item (@lib_contents) {
-    if ($item !~ m{^lib/(?:CGI|README)}) {
-        do_command("rm", "-rf", $item);
-    }
+if ($switch{'docs'}) {
+    print "Building docs...\n";
+    do_command("perl", "./docs/makedocs.pl", "--with-pdf");
 }
 
 chdir ".." or die "..: $!";
