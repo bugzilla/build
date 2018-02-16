@@ -21,13 +21,14 @@ $tag || die "second argument must be the version number (bugzilla-<version> git 
 # --single-branch only checksout the branch the tag exists in
 # --depth 1 is used to omit getting full history
 # -b <tag_name> only clones up to the tag such as bugzilla-4.4.6
-my $full_name = "bugzilla-$tag";
-my $full_url  = "https://git.mozilla.org/bugzilla/bugzilla.git";
+my $release_tag  = "release-$tag";
+my $bugzilla_ver = "bugzilla-$tag";
+my $git_url      = "https://github.com/bugzilla/bugzilla.git";
 
-do_command('git', 'clone', $full_url, "--single-branch", "--depth", 1, "-b", $full_name, $full_name);
+do_command('git', 'clone', $git_url, "--single-branch", "--depth", 1, "-b", $release_tag, $bugzilla_ver);
 
-print "cd $full_name\n";
-chdir $full_name or die "$full_name: $!";
+print "cd $bugzilla_ver\n";
+chdir $bugzilla_ver or die "$bugzilla_ver: $!";
 
 if ($switch{'docs'}) {
     print "Building docs...\n";
@@ -35,4 +36,4 @@ if ($switch{'docs'}) {
 }
 
 chdir ".." or die "..: $!";
-do_command("tar", "-czf", "$full_name.tar.gz", $full_name);
+do_command("tar", "-czf", "$bugzilla_ver.tar.gz", $bugzilla_ver);
